@@ -15,24 +15,28 @@ def debug_print(*args, **kwargs):
 
 
 def which(exe):
+    #, stdout=open(os.devnull, 'w')
     return 0 == subprocess.call(['which', exe])
 
 
 if __name__ == '__main__':
-    cur_word = sys.argv[1]
+    cur_word = int(sys.argv[1])
     all_words = sys.argv[2:]
     exe = all_words[0]
+    debug_print("current word is: {} all_words are: {}".format(cur_word, all_words).replace(" ", "_"))
     i = 1
     if exe == 'python':
-        while i < len(all_words):
+        while i < cur_word and i < len(all_words):
+            debug_print("looking for exe".replace(' ', '_'))
             if not all_words[i].startswith('-'):
                 if os.path.isfile(all_words[i]) or which(all_words[i]):
                     exe = all_words[i]
+                    debug_print("found exe at {}".format(exe).replace(" ", "_"))
                     break
             i += 1
 
     if exe == 'python':
-        debug_print("no script was found")
+        debug_print("no script was found".replace(' ', '_'))
 
         python_options = "-3   -c   -E   -i   -O   -Q   -s   -t   -v   -W   -B   -d   -h   -m   -OO  -R   -S   -u   -V   -x".split()
         res = []
@@ -47,7 +51,7 @@ if __name__ == '__main__':
         print(" ".join(res))
         exit()
 
-    # verify exe has necessary rag
+    # verify exe has necessary tag
     if not os.path.exists(exe):
         debug_print("cant find exe in files. cwd: {} exe: {}".format(os.getcwd(), exe))
         exit()
