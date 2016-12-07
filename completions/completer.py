@@ -1,5 +1,5 @@
 from sys import argv
-from get_completions import completion_arg
+from completions import completion_arg
 
 # This is here to make it look like i wrote completers even though im lazy
 from argcomplete.completers import *
@@ -45,7 +45,7 @@ class ArgCompleter(object):
         else:
             if cur_word == 0:
                 exit(0)
-            o = all_words[cur_word]
+            o = all_words[cur_word - 1]
             action = None
             for a in actions:
                 if o in a.option_strings:

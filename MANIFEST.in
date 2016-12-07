@@ -1,0 +1,2 @@
+include bin/get_python_completions
+include bin/python_autocomplete.sh

@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+import sys
+import os
+import subprocess
+from argcomplete.completers import FilesCompleter
+from completions import completion_arg, completion_tag, DEBUG_KEY
+
+
+DEBUG = DEBUG_KEY in os.environ
+
+
+def debug_print(*args, **kwargs):
+    if DEBUG:
+        print(args, kwargs)
+
+
+def which(exe):
+    return 0 == subprocess.call(['which', exe])
+
+
+if __name__ == '__main__':
+    cur_word = sys.argv[1]
+    all_words = sys.argv[2:]
+    exe = all_words[0]
+    i = 1
+    if exe == 'python':
+        while i < len(all_words):
+            if not all_words[i].startswith('-'):
+                if os.path.isfile(all_words[i]) or which(all_words[i]):
+                    exe = all_words[i]
+                    break
+            i += 1
+
+    if exe == 'python':
+        debug_print("no script was found")
+
+        python_options = "-3   -c   -E   -i   -O   -Q   -s   -t   -v   -W   -B   -d   -h   -m   -OO  -R   -S   -u   -V   -x".split()
+        res = []
+        cur_word = int(cur_word)
+        if cur_word == len(all_words):
+            all_words.append('')
+
+        res = FilesCompleter()(all_words[int(cur_word)])
+        res .extend([o for o in python_options if o.startswith(all_words[int(cur_word)])])
+
+        # Print python options.
+        print(" ".join(res))
+        exit()
+
+    # verify exe has necessary rag
+    if not os.path.exists(exe):
+        debug_print("cant find exe in files. cwd: {} exe: {}".format(os.getcwd(), exe))
+        exit()
+
+    with open(exe) as txt:
+        data = txt.read(4096)
+        if completion_tag not in data:
+            debug_print("no completion tag")
+            exit(0)
+
+    sub_exe = all_words[0:i+1]
+    e = os.environ.copy()
+    debug_print("calling subprocess with {} and {}".format(cur_word, all_words))
+    subprocess.call(sub_exe + [completion_arg, str(cur_word)] + all_words)
